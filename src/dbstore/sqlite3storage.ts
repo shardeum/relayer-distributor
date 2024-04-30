@@ -40,6 +40,30 @@ export async function init(config: Config): Promise<void> {
   console.log('Database initialized.')
 }
 
+/**
+ * Closes Database Connection Gracefully
+ */
+export async function close(): Promise<void> {
+  try {
+    console.log('Terminating Database Connections...')
+    await new Promise<void>((resolve, reject) => {
+      db.close((err) => {
+        if (err) {
+          console.log('Error closing database connection')
+          console.log(err)
+          reject(err)
+        } else {
+          console.log('Database connection closed.')
+          resolve()
+        }
+      })
+    })
+  } catch (err) {
+    console.error('Error thrown in db close() function: ')
+    console.error(err)
+  }
+}
+
 export async function runCreate(createStatement: string): Promise<void> {
   await run(createStatement)
 }

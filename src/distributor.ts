@@ -73,6 +73,16 @@ const addSigListeners = (): void => {
       updateConfigAndSubscriberList()
     }
   })
+  process.on('SIGINT', async () => {
+    console.log('Exiting on SIGINT')
+    await dbstore.closeDatabase()
+    process.exit(0)
+  })
+  process.on('SIGTERM', async () => {
+    console.log('Exiting on SIGTERM')
+    await dbstore.closeDatabase()
+    process.exit(0)
+  })
   process.on('uncaughtException', (error) => {
     console.error('Uncaught Exception in Distributor: ', error)
   })
