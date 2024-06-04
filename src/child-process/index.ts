@@ -9,6 +9,7 @@ import type { Worker } from 'node:cluster'
 import { handleSocketRequest, registerParentProcessListener } from './child'
 import Fastify, { FastifyInstance } from 'fastify'
 import fastifyRateLimit from '@fastify/rate-limit'
+import { Utils as StringUtils } from '@shardus/types'
 import { registerRoutes, validateRequestData } from '../api'
 
 interface ClientRequestDataInterface {

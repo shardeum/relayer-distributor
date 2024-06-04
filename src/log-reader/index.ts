@@ -8,6 +8,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as EventEmitter from 'events'
 import * as readline from 'readline'
+import { Utils as StringUtils } from '@shardus/types'
 
 import { config } from '../Config'
 class DataLogReader extends EventEmitter {
