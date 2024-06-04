@@ -66,7 +66,7 @@
     "@fastify/cors": "^8.2.0",
     "@fastify/rate-limit": "^7.6.0",
     "@shardus/crypto-utils": "^4.0.4",
-    "@shardus/types": "^1.0.8",
+    "@shardus/types": "^1.2.13",
     "deepmerge": "^4.2.2",
     "eslint": "^8.43.0",
     "fastify": "4.12.0",
