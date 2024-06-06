@@ -18,7 +18,6 @@ export interface Config {
   DATA_LOG_DIR: string
   FILE_STREAM_INTERVAL_MS: number
   MAX_CLIENTS_PER_CHILD: number
-  useSerialization: boolean
   limitToSubscribersOnly: boolean
   subscribers: [] | Subscriber[]
 }
@@ -39,7 +38,6 @@ let config: Config = {
   FILE_STREAM_INTERVAL_MS: 100, // Check for new data every 100 ms
   MAX_CLIENTS_PER_CHILD: 2,
   VERBOSE: false,
-  useSerialization: true,
   limitToSubscribersOnly: false,
   subscribers: [],
 }

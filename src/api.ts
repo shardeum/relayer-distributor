@@ -264,6 +264,7 @@ export function registerRoutes(server: FastifyInstance<Server, IncomingMessage, 
   })
 
   server.post('/receipt', async (_request: ReceiptRequest, reply) => {
+    console.log(`[gold] receipt: ${StringUtils.safeStringify(_request.body)}`)
     const requestData = _request.body as RequestBody
     const result = validateRequestData(requestData, {
       count: 'n?',
@@ -278,6 +279,7 @@ export function registerRoutes(server: FastifyInstance<Server, IncomingMessage, 
       sender: 's',
       sign: 'o',
     })
+    console.log(`[gold] receipt sign result: ${result}`)
     if (!result.success) {
       reply.send(Crypto.sign({ success: false, error: result.error }))
       return
@@ -398,6 +400,7 @@ export function registerRoutes(server: FastifyInstance<Server, IncomingMessage, 
     const res = Crypto.sign({
       receipts,
     })
+    console.log(`[gold] receipt res: ${StringUtils.safeStringify(res)}`)
     reply.send(res)
   })
 
