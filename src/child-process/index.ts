@@ -47,6 +47,20 @@ export const initHttpServer = async (worker: Worker): Promise<void> => {
     allowList: ['127.0.0.1', '0.0.0.0'], // Excludes local IPs from rate limits
   })
 
+  fastifyServer.addContentTypeParser('application/json', { parseAs: 'string' }, (req, body, done) => {
+    try {
+      const jsonString = typeof body === 'string' ? body : body.toString('utf8')
+      done(null, StringUtils.safeJsonParse(jsonString))
+    } catch (err) {
+      err.statusCode = 400
+      done(err, undefined)
+    }
+  })
+
+  fastifyServer.setReplySerializer((payload) => {
+    return StringUtils.safeStringify(payload)
+  })
+
   // Register API routes
   registerRoutes(fastifyServer as FastifyInstance<http.Server, http.IncomingMessage, http.ServerResponse>)
 
