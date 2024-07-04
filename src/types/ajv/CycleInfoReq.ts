@@ -1,4 +1,6 @@
 import { addSchema } from '../../utils/serialization/SchemaHelpers'
+import { DistributorAjvTypeReqRespEnum } from '../enum/DistributorAjvTypeReqRespEnum'
+
 // Define the schema for CycleInfoRequest
 export const schemaCycleInfoReq = {
   type: 'object',
@@ -31,5 +33,5 @@ function addSchemaDependencies(): void {
 
 // Register schemas
 function addSchemas(): void {
-  addSchema('CycleInfoReq', schemaCycleInfoReq)
+  addSchema(DistributorAjvTypeReqRespEnum.CycleInfoReq, schemaCycleInfoReq)
 }

@@ -13,7 +13,7 @@ import * as OriginalTxDB from './dbstore/originalTxsData'
 import { distributorSubscribers } from './distributor/utils'
 import { Utils as StringUtils } from '@shardus/types'
 import { verifyPayload } from './types/ajv/Helpers'
-
+import { DistributorAjvTypeReqRespEnum } from './types/enum/DistributorAjvTypeReqRespEnum'
 const TXID_LENGTH = 64
 export const MAX_ACCOUNTS_PER_REQUEST = 1000
 export const MAX_RECEIPTS_PER_REQUEST = 100
@@ -60,7 +60,7 @@ export function registerRoutes(server: FastifyInstance<Server, IncomingMessage, 
   server.post('/cycleinfo', async (_request: CycleInfoRequest & Request, reply) => {
     const requestData = _request.body
     // Start verify request data
-    let verified = verifyPayload("CycleInfoReq", requestData)
+    let verified = verifyPayload(DistributorAjvTypeReqRespEnum.CycleInfoReq, requestData)
     if (!verified) {
       reply.send(Crypto.sign({ success: false, error: 'AJV verify error' }))
       return
@@ -137,7 +137,7 @@ export function registerRoutes(server: FastifyInstance<Server, IncomingMessage, 
   server.post('/originalTx', async (_request: ReceiptRequest & Request, reply) => {
     const requestData = _request.body
     // Start verify request data
-    let verified = verifyPayload("OriginalTxReq", requestData)
+    let verified = verifyPayload(DistributorAjvTypeReqRespEnum.OriginalTxReq, requestData)
     if (!verified) {
       reply.send(Crypto.sign({ success: false, error: 'AJV verify error' }))
       return
@@ -282,7 +282,7 @@ export function registerRoutes(server: FastifyInstance<Server, IncomingMessage, 
   server.post('/receipt', async (_request: ReceiptRequest, reply) => {
     const requestData = _request.body as RequestBody
     // Start verify request data
-    let verified = verifyPayload("ReceiptReq", requestData)
+    let verified = verifyPayload(DistributorAjvTypeReqRespEnum.ReceiptReq, requestData)
     if (!verified) {
       reply.send(Crypto.sign({ success: false, error: 'AJV verify error' }))
       return
@@ -441,7 +441,7 @@ export function registerRoutes(server: FastifyInstance<Server, IncomingMessage, 
     const requestData = _request.body
 
     // Start verify request data
-    let verified = verifyPayload("AccountReq", requestData)
+    let verified = verifyPayload(DistributorAjvTypeReqRespEnum.AccountReq, requestData)
     if (!verified) {
       reply.send(Crypto.sign({ success: false, error: 'AJV verify error' }))
       return
@@ -576,7 +576,7 @@ export function registerRoutes(server: FastifyInstance<Server, IncomingMessage, 
   server.post('/transaction', async (_request: TransactionRequest & Request, reply) => {
     const requestData = _request.body
     // Start verify request data
-    let verified = verifyPayload("TransactionReq", requestData)
+    let verified = verifyPayload(DistributorAjvTypeReqRespEnum.TransactionReq, requestData)
     if (!verified) {
       reply.send(Crypto.sign({ success: false, error: 'AJV verify error' }))
       return
@@ -704,7 +704,7 @@ export function registerRoutes(server: FastifyInstance<Server, IncomingMessage, 
   server.post('/totalData', async (_request: Request, reply) => {
     const requestData = _request.body
     // Start verify request data
-    let verified = verifyPayload("TotalDataReq", requestData)
+    let verified = verifyPayload(DistributorAjvTypeReqRespEnum.TotalDataReq, requestData)
     if (!verified) {
       reply.send(Crypto.sign({ success: false, error: 'AJV verify error' }))
       return

@@ -1,4 +1,4 @@
-import { initAjvSchemas, verifyPayload } from '../../../../types/ajv/Helpers'
+import { initAjvSchemas, verifyPayload } from '../../../../src/types/ajv/Helpers'
 
 describe('CycleInfo req test', () => {
   beforeAll(() => {

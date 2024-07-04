@@ -2,7 +2,6 @@ import { ErrorObject } from 'ajv'
 import { Utils } from '@shardus/types'
 import { getVerifyFunction } from '../../utils/serialization/SchemaHelpers'
 import { initCycleInfoReq } from './CycleInfoReq'
-import { initCycleInfoResp } from './CycleInfoResq'
 import { initAccountReq } from './AccountReq'
 import { initReceiptReq } from './ReceiptReq'
 import { initOriginalTxReq } from './OriginalTxReq'
@@ -12,7 +11,6 @@ import { initTransactionReq } from './TransactionReq'
 export function initAjvSchemas(): void {
   // list of init req and resp of external endpoints
   initCycleInfoReq()
-  initCycleInfoResp()
   initAccountReq()
   initReceiptReq()
   initOriginalTxReq()

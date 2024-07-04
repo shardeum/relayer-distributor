@@ -1,5 +1,5 @@
 import { addSchema } from '../../utils/serialization/SchemaHelpers'
-
+import { DistributorAjvTypeReqRespEnum } from '../enum/DistributorAjvTypeReqRespEnum'
 // Define the schema for ReceiptRequest
 export const schemaAccountReq = {
   type: 'object',
@@ -36,5 +36,5 @@ function addSchemaDependencies(): void {
 
 // Register schemas
 function addSchemas(): void {
-  addSchema('AccountReq', schemaAccountReq)
+  addSchema(DistributorAjvTypeReqRespEnum.AccountReq, schemaAccountReq)
 }

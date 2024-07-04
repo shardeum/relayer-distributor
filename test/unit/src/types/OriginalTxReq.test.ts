@@ -1,6 +1,6 @@
-import { initAjvSchemas, verifyPayload } from '../../../../types/ajv/Helpers'
+import { initAjvSchemas, verifyPayload } from '../../../../src/types/ajv/Helpers'
 
-describe('Account req test', () => {
+describe('OriginalTx req test', () => {
   beforeAll(() => {
     initAjvSchemas()
   })
@@ -41,11 +41,11 @@ describe('Account req test', () => {
         },
         start: 2,
         end: 0,
-        accountId: '0x1',
+        txIdList: '0x1',
       },
     ]
     test.each(invalidObjects)('should throw AJV error', (data) => {
-      const res = verifyPayload('AccountReq', {
+      const res = verifyPayload('OriginalTxReq', {
         start: 0,
         end: 0,
         count: 0,
@@ -57,7 +57,7 @@ describe('Account req test', () => {
       // expect(res[0]).toEqual(`should have required property 'sender': {"missingProperty":"sender"}`)
     })
     test.each(otherInvalidObject)('should throw AJV error', (data) => {
-      const res = verifyPayload('AccountReq', {
+      const res = verifyPayload('OriginalTxReq', {
         ...data,
       })
       console.log('res', res)
@@ -66,7 +66,7 @@ describe('Account req test', () => {
       // expect(res[0]).toEqual(`should be number,null: {"type":"number,null"}`)
     })
     test.each(validObjects)('should have no AJV error', (data) => {
-      const res = verifyPayload('AccountReq', {
+      const res = verifyPayload('OriginalTxReq', {
         ...data,
       })
       console.log('res', res)
