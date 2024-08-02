@@ -4,9 +4,10 @@ import * as http from 'http'
 import * as Logger from '../Logger'
 
 import { config } from '../Config'
+import DataLogReader from '../log-reader'
 import fastifyCors from '@fastify/cors'
 import type { Worker } from 'node:cluster'
-import { handleSocketRequest, registerParentProcessListener } from './child'
+import { handleSocketRequest, registerParentProcessListener, registerDataReaderListeners } from './child'
 import Fastify, { FastifyInstance } from 'fastify'
 import fastifyRateLimit from '@fastify/rate-limit'
 import { Utils as StringUtils } from '@shardus/types'
@@ -116,4 +117,27 @@ const initSocketServer = async (httpServer: http.Server, worker: Worker): Promis
       return
     }
   })
+}
+
+export const initWorker  = async(): Promise<void> => {
+  try {
+    const DATA_LOG_PATH = config.DATA_LOG_DIR
+    const cycleReader = new DataLogReader(DATA_LOG_PATH, 'cycle')
+    const receiptReader = new DataLogReader(DATA_LOG_PATH, 'receipt')
+    const originalTxReader = new DataLogReader(DATA_LOG_PATH, 'originalTx')
+    await Promise.all([receiptReader.init(), cycleReader.init(), originalTxReader.init()])
+    registerDataReaderListeners(cycleReader)
+    registerDataReaderListeners(receiptReader)
+    registerDataReaderListeners(originalTxReader)
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      console.error(
+        '❌ Path to the data-logs directory does not exist. Please check the path in the config file.\n Current Path: ',
+        config.DATA_LOG_DIR
+      )
+      process.exit(0)
+    } else {
+      console.error('Error in Child Process: ', e.message, e.code)
+    }
+  }
 }
