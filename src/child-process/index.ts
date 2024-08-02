@@ -11,6 +11,7 @@ import Fastify, { FastifyInstance } from 'fastify'
 import fastifyRateLimit from '@fastify/rate-limit'
 import { Utils as StringUtils } from '@shardus/types'
 import { registerRoutes, validateRequestData } from '../api'
+import { healthCheckRouter } from '../routes/healthCheck'
 
 interface ClientRequestDataInterface {
   header: object
@@ -46,6 +47,7 @@ export const initHttpServer = async (worker: Worker): Promise<void> => {
     timeWindow: 10,
     allowList: ['127.0.0.1', '0.0.0.0'], // Excludes local IPs from rate limits
   })
+  await fastifyServer.register(healthCheckRouter)
 
   fastifyServer.addContentTypeParser('application/json', { parseAs: 'string' }, (req, body, done) => {
     try {
