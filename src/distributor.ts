@@ -1,10 +1,10 @@
-import { cpus } from 'os'
+import * as v8 from 'v8'
 import { join } from 'path'
 import * as Logger from './Logger'
 import * as dbstore from './dbstore'
 import type { Worker } from 'cluster'
 import * as clusterModule from 'cluster'
-import { initHttpServer } from './child-process'
+import { initHttpServer, initWorker } from './child-process'
 import { setHashKey, initLogger } from './utils'
 import { config, overrideDefaultConfig } from './Config'
 
@@ -22,7 +22,7 @@ const file = join(process.cwd(), 'distributor-config.json')
 const { argv, env } = process
 
 // const NUMBER_OF_WORKERS = cpus().length
-const NUMBER_OF_WORKERS = 2
+const NUMBER_OF_WORKERS = 5
 
 const initDistributor = async (): Promise<void> => {
   // Common logic for both parent and worker processes
@@ -39,6 +39,9 @@ const initDistributor = async (): Promise<void> => {
     // Primary/Parent Process Logic
     Logger.mainLogger.debug(`Distributor Master Process (${process.pid}) Started`)
     for (let i = 0; i < NUMBER_OF_WORKERS; i++) {
+      // const worker: Worker = cluster.fork({
+      //   execArgv: process.execArgv.concat([`--inspect=0.0.0.0:${9229 + i}`])
+      // });
       const worker: Worker = cluster.fork()
       workerClientMap.set(worker, [])
       workerProcessMap.set(worker.process.pid, worker)
@@ -50,11 +53,31 @@ const initDistributor = async (): Promise<void> => {
     cluster.on('exit', (worker: Worker) => {
       Logger.mainLogger.debug(`Worker Process (${worker}) Terminated`)
     })
+
+    console.log(
+      `Primary Process Heap Memory limit: ${v8.getHeapStatistics().heap_size_limit / 1024 / 1024} MB`
+    )
+    setInterval(() => {
+      const memoryUsage = process.memoryUsage()
+      console.log(
+        `Primary Process Heap Used: ${memoryUsage.heapUsed / 1024 / 1024} MB / ${memoryUsage.heapTotal / 1024 / 1024} MB`
+      )
+    }, 20000) // log every 20 seconds
   } else {
+    await initWorker()
     // Worker Process Logic
     await dbstore.initializeDB(config)
     const { worker } = cluster
     await initHttpServer(worker)
+    console.log(
+      `Worker ${worker.process.pid} > Heap Memory limit: ${v8.getHeapStatistics().heap_size_limit / 24 / 1024} MB`
+    )
+    setInterval(() => {
+      const memoryUsage = process.memoryUsage()
+      console.log(
+        `Heap Used in Worker ${worker.process.pid}: ${memoryUsage.heapUsed / 1024 / 1024} MB / ${memoryUsage.heapTotal / 1024 / 1024} MB`
+      )
+    }, 20000) // log every 20 seconds
   }
 }
 

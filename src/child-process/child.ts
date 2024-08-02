@@ -94,7 +94,7 @@ const sendDataToAllClients = ({ signedData }: { signedData: Record<string, unkno
   }
 }
 
-const registerDataReaderListeners = (reader: DataLogReader): void => {
+export const registerDataReaderListeners = (reader: DataLogReader): void => {
   reader.on(`${reader.dataName}-data`, (logData: unknown) => {
     try {
       const data: {
@@ -133,30 +133,3 @@ const registerDataReaderListeners = (reader: DataLogReader): void => {
     console.error(`Error reading log file: ${err}`)
   })
 }
-
-;(async (): Promise<void> => {
-  try {
-    const DATA_LOG_PATH = config.DATA_LOG_DIR
-    const cycleReader = new DataLogReader(DATA_LOG_PATH, 'cycle')
-    const receiptReader = new DataLogReader(DATA_LOG_PATH, 'receipt')
-    const originalTxReader = new DataLogReader(DATA_LOG_PATH, 'originalTx')
-    await Promise.all([receiptReader.init(), cycleReader.init(), originalTxReader.init()])
-    registerDataReaderListeners(cycleReader)
-    registerDataReaderListeners(receiptReader)
-    registerDataReaderListeners(originalTxReader)
-  } catch (e) {
-    if (e.code === 'ENOENT') {
-      console.error(
-        '❌ Path to the data-logs directory does not exist. Please check the path in the config file.\n Current Path: ',
-        config.DATA_LOG_DIR
-      )
-      process.exit(0)
-    } else {
-      console.error('Error in Child Process: ', e.message, e.code)
-    }
-  }
-})()
-
-process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception in Child Process:', error)
-})

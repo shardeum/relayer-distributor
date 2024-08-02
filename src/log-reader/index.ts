@@ -108,13 +108,20 @@ class DataLogReader extends EventEmitter {
     let currentSize = startSize
     let totalNumberOfEntries = startEntries
 
+    let reading = false
     const fileStreamer = setInterval(() => {
+      if (reading) return
+      reading = true
       fs.stat(logFile, (err, stats) => {
         if (err) {
           console.error(err)
+          reading = false
           return
         }
         if (stats.size > currentSize) {
+          const sizeDiff = stats.size - currentSize
+          if (sizeDiff / 1024 / 1024 > 100)
+            console.log(this.dataName, stats.size, currentSize, sizeDiff / 1024 / 1024, 'MB')
           const stream = fs.createReadStream(logFile, {
             encoding: 'utf8',
             start: currentSize,
@@ -154,7 +161,7 @@ class DataLogReader extends EventEmitter {
                 this.emit(`${this.dataName}-data`, parse)
               }
             } catch (e) {
-              console.error('❌ Damaged line Detected! >: ', data)
+              console.error(this.dataName, '❌ Damaged line Detected! >: ')
               currentSize = lastSize
               totalNumberOfEntries = lastTotalNumberOfEntries
             }
@@ -166,7 +173,10 @@ class DataLogReader extends EventEmitter {
             // End of line
             rl.close()
             stream.close()
+            reading = false
           })
+        } else {
+          reading = false
         }
       })
     }, config.FILE_STREAM_INTERVAL_MS) // Check for new data
