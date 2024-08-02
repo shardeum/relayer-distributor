@@ -133,3 +133,7 @@ export const registerDataReaderListeners = (reader: DataLogReader): void => {
     console.error(`Error reading log file: ${err}`)
   })
 }
+
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception in Child Process:', error)
+})
