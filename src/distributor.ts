@@ -71,7 +71,7 @@ const initDistributor = async (): Promise<void> => {
       console.log(
         `Primary Process Heap Used: ${memoryUsage.heapUsed / 1024 / 1024} MB / ${memoryUsage.heapTotal / 1024 / 1024} MB`
       )
-    }, 20000) // log every 20 seconds
+    }, 30000) // log every 30 seconds
   } else {
     await initWorker()
     // Worker Process Logic
@@ -86,7 +86,7 @@ const initDistributor = async (): Promise<void> => {
       console.log(
         `Heap Used in Worker ${worker.process.pid}: ${memoryUsage.heapUsed / 1024 / 1024} MB / ${memoryUsage.heapTotal / 1024 / 1024} MB`
       )
-    }, 20000) // log every 20 seconds
+    }, 30000) // log every 30 seconds
   }
 }
 
