@@ -119,6 +119,15 @@ class DataLogReader extends EventEmitter {
           return
         }
         if (stats.size > currentSize) {
+          console.log(
+            this.dataName,
+            'totalNumberOfEntries',
+            totalNumberOfEntries,
+            'currentSize',
+            currentSize,
+            'stats.size',
+            stats.size
+          )
           const sizeDiff = stats.size - currentSize
           if (sizeDiff / 1024 / 1024 > 100)
             console.log(this.dataName, stats.size, currentSize, sizeDiff / 1024 / 1024, 'MB')
@@ -127,9 +136,6 @@ class DataLogReader extends EventEmitter {
             start: currentSize,
             end: stats.size,
           })
-          const lastSize = currentSize
-          const lastTotalNumberOfEntries = totalNumberOfEntries
-          currentSize = stats.size
 
           const rl = readline.createInterface({
             input: stream,
@@ -160,10 +166,10 @@ class DataLogReader extends EventEmitter {
                 /* prettier-ignore */ if (config.VERBOSE) console.log(`${this.dataName}-data`, data)
                 this.emit(`${this.dataName}-data`, parse)
               }
+              currentSize += Buffer.byteLength(data + '\n')
             } catch (e) {
-              console.error(this.dataName, '❌ Damaged line Detected! >: ')
-              currentSize = lastSize
-              totalNumberOfEntries = lastTotalNumberOfEntries
+              console.error(this.dataName, '❌ Damaged line Detected! >: ', data.length, data)
+              console.log(this.dataName, 'Damaged line Detected! >: ', 'totalNumberOfEntries', totalNumberOfEntries, 'currentSize', currentSize)
             }
           })
           rl.on('error', (err) => {
