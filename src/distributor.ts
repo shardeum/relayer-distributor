@@ -6,7 +6,7 @@ import type { Worker } from 'cluster'
 import * as clusterModule from 'cluster'
 import { initHttpServer, initWorker } from './child-process'
 import { setHashKey, initLogger } from './utils'
-import { config, overrideDefaultConfig } from './Config'
+import { config, distributorMode, overrideDefaultConfig } from './Config'
 
 import {
   workerClientMap,
@@ -15,6 +15,8 @@ import {
   updateConfigAndSubscriberList,
   registerWorkerMessageListener,
 } from './distributor/utils'
+import RMQDataPublisher from './distributor/rmq_data_publisher'
+import { CheckpointDao } from './dbstore/checkpoints'
 
 const cluster = clusterModule as unknown as clusterModule.Cluster
 // Override default config params from config file, env vars, and cli args
@@ -73,7 +75,9 @@ const initDistributor = async (): Promise<void> => {
       )
     }, 30000) // log every 30 seconds
   } else {
-    await initWorker()
+    if (config.distributorMode == distributorMode.WS) {
+      await initWorker()
+    }
     // Worker Process Logic
     await dbstore.initializeDB(config)
     const { worker } = cluster
@@ -121,4 +125,33 @@ const addSigListeners = (): void => {
   Logger.mainLogger.debug('Registered signal listeners.')
 }
 
-initDistributor()
+const initDistributorMQMode = async (): Promise<void> => {
+  initLogger()
+  await dbstore.initializeDB(config)
+  await CheckpointDao.init()
+
+  const rmqDataPublisher = new RMQDataPublisher()
+  rmqDataPublisher.start()
+
+  process.on('SIGTERM', async () => {
+    console.log('Exiting initDistributorMQMode on SIGTERM')
+    await rmqDataPublisher.cleanUp()
+    CheckpointDao.close()
+    process.exit(0)
+  })
+
+  process.on('SIGINT', async () => {
+    console.log('Exiting initDistributorMQMode on SIGTERM')
+    await rmqDataPublisher.cleanUp()
+    CheckpointDao.close()
+    process.exit(0)
+  })
+}
+
+if (config.distributorMode === distributorMode.MQ) {
+  console.log(`Initiating Distributor in MQ mode`)
+  initDistributorMQMode()
+} else {
+  console.log(`Initiating Distributor in WS mode`)
+  initDistributor()
+}

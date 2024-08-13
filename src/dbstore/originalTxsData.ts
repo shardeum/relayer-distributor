@@ -62,6 +62,7 @@ export async function bulkInsertOriginalTxsData(originalTxsData: OriginalTxData[
   } catch (e) {
     Logger.mainLogger.error(e)
     Logger.mainLogger.error('Unable to bulk insert OriginalTxsData', originalTxsData.length)
+    throw e // check with Achal/Jai
   }
 }
 
@@ -95,7 +96,7 @@ export async function queryOriginalTxsData(
     let sql = `SELECT * FROM originalTxsData`
     const sqlSuffix = ` ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
     const values: number[] = []
-    if (startCycle && endCycle) {
+    if (startCycle >= 0 && endCycle >= 0) {
       sql += ` WHERE cycle BETWEEN ? AND ?`
       values.push(startCycle, endCycle)
     }

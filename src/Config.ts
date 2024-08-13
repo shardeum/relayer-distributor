@@ -5,6 +5,11 @@ import * as merge from 'deepmerge'
 import * as minimist from 'minimist'
 import { Utils as StringUtils } from '@shardus/types'
 
+export enum distributorMode {
+  WS = 'WS',
+  MQ = 'MQ',
+}
+
 export interface Config {
   DISTRIBUTOR_IP: string
   DISTRIBUTOR_PORT: number
@@ -28,6 +33,7 @@ export interface Config {
   MAX_CLIENTS_PER_CHILD: number
   limitToSubscribersOnly: boolean
   subscribers: [] | Subscriber[]
+  distributorMode: string
 }
 
 let config: Config = {
@@ -56,6 +62,7 @@ let config: Config = {
   VERBOSE: false,
   limitToSubscribersOnly: false,
   subscribers: [],
+  distributorMode: process.env.DISTRIBUTOR_MODE || distributorMode.WS.toString(),
 }
 
 export interface Subscriber {
