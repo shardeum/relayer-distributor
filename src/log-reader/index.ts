@@ -119,15 +119,16 @@ class DataLogReader extends EventEmitter {
           return
         }
         if (stats.size > currentSize) {
-          console.log(
-            this.dataName,
-            'totalNumberOfEntries',
-            totalNumberOfEntries,
-            'currentSize',
-            currentSize,
-            'stats.size',
-            stats.size
-          )
+          if (config.VERBOSE)
+            console.log(
+              this.dataName,
+              'totalNumberOfEntries',
+              totalNumberOfEntries,
+              'currentSize',
+              currentSize,
+              'stats.size',
+              stats.size
+            )
           const sizeDiff = stats.size - currentSize
           if (sizeDiff / 1024 / 1024 > 100)
             console.log(this.dataName, stats.size, currentSize, sizeDiff / 1024 / 1024, 'MB')
@@ -169,7 +170,15 @@ class DataLogReader extends EventEmitter {
               currentSize += Buffer.byteLength(data + '\n')
             } catch (e) {
               console.error(this.dataName, '❌ Damaged line Detected! >: ', data.length, data)
-              console.log(this.dataName, 'Damaged line Detected! >: ', 'totalNumberOfEntries', totalNumberOfEntries, 'currentSize', currentSize)
+              if (config.VERBOSE)
+                console.log(
+                  this.dataName,
+                  'Damaged line Detected! >: ',
+                  'totalNumberOfEntries',
+                  totalNumberOfEntries,
+                  'currentSize',
+                  currentSize
+                )
             }
           })
           rl.on('error', (err) => {

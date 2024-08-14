@@ -21,8 +21,14 @@ const cluster = clusterModule as unknown as clusterModule.Cluster
 const file = join(process.cwd(), 'distributor-config.json')
 const { argv, env } = process
 
-// const NUMBER_OF_WORKERS = cpus().length
-const NUMBER_OF_WORKERS = 5
+const spawnWorker = (): Worker => {
+  const worker: Worker = cluster.fork()
+  workerClientMap.set(worker, [])
+  workerProcessMap.set(worker.process.pid, worker)
+  registerWorkerMessageListener(worker)
+  if (config.limitToSubscribersOnly) refreshSubscribers()
+  return worker
+}
 
 const initDistributor = async (): Promise<void> => {
   // Common logic for both parent and worker processes
@@ -38,20 +44,23 @@ const initDistributor = async (): Promise<void> => {
   if (cluster.isPrimary) {
     // Primary/Parent Process Logic
     Logger.mainLogger.debug(`Distributor Master Process (${process.pid}) Started`)
-    for (let i = 0; i < NUMBER_OF_WORKERS; i++) {
+    for (let i = 0; i < config.NUMBER_OF_WORKERS; i++) {
       // const worker: Worker = cluster.fork({
       //   execArgv: process.execArgv.concat([`--inspect=0.0.0.0:${9229 + i}`])
       // });
-      const worker: Worker = cluster.fork()
-      workerClientMap.set(worker, [])
-      workerProcessMap.set(worker.process.pid, worker)
-      registerWorkerMessageListener(worker)
-      if (config.limitToSubscribersOnly) refreshSubscribers()
+      const worker = spawnWorker()
       console.log(`⛏️ Worker ${worker.process.pid} started`)
     }
 
-    cluster.on('exit', (worker: Worker) => {
-      Logger.mainLogger.debug(`Worker Process (${worker}) Terminated`)
+    cluster.on('exit', (worker: Worker, code: number, signal: string) => {
+      Logger.mainLogger.debug(`❌ Worker ${worker.process.pid} exited with code ${code} and signal ${signal}`)
+      const outGoingWorker = workerProcessMap.get(worker.process.pid)
+      if (outGoingWorker) {
+        workerClientMap.delete(outGoingWorker)
+        workerProcessMap.delete(outGoingWorker.process.pid)
+      }
+      const newWorker = spawnWorker()
+      Logger.mainLogger.debug(`⛏️ Worker ${newWorker.process.pid} started to replace the terminated one`)
     })
 
     console.log(
@@ -62,7 +71,7 @@ const initDistributor = async (): Promise<void> => {
       console.log(
         `Primary Process Heap Used: ${memoryUsage.heapUsed / 1024 / 1024} MB / ${memoryUsage.heapTotal / 1024 / 1024} MB`
       )
-    }, 20000) // log every 20 seconds
+    }, 30000) // log every 30 seconds
   } else {
     await initWorker()
     // Worker Process Logic
@@ -77,7 +86,7 @@ const initDistributor = async (): Promise<void> => {
       console.log(
         `Heap Used in Worker ${worker.process.pid}: ${memoryUsage.heapUsed / 1024 / 1024} MB / ${memoryUsage.heapTotal / 1024 / 1024} MB`
       )
-    }, 20000) // log every 20 seconds
+    }, 30000) // log every 30 seconds
   }
 }
 

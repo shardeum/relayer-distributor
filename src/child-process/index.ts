@@ -72,7 +72,7 @@ export const initHttpServer = async (worker: Worker): Promise<void> => {
   fastifyServer.ready(() => {
     httpServer.listen(config.DISTRIBUTOR_PORT, () => {
       console.log(`Distributor-Server (${process.pid}) listening on port ${config.DISTRIBUTOR_PORT}.`)
-      Logger.mainLogger.debug(`Worker Process (${process.pid}) Started .`)
+      Logger.mainLogger.debug(`API-Server started on Worker Process (${process.pid}).`)
       return
     })
 
@@ -117,7 +117,7 @@ const initSocketServer = async (httpServer: http.Server, worker: Worker): Promis
   })
 }
 
-export const initWorker  = async(): Promise<void> => {
+export const initWorker = async (): Promise<void> => {
   try {
     const DATA_LOG_PATH = config.DATA_LOG_DIR
     const cycleReader = new DataLogReader(DATA_LOG_PATH, 'cycle')
