@@ -44,6 +44,7 @@ export default class RMQDataPublisher {
   private checkpointDataType = 'cycle'
   private cycleVsTxMap = new Map<number, Map<string, TxData | null>>()
   private cycleVsRcptMap = new Map<number, Map<string, ReceiptData | null>>()
+  private cyclePublishedMap = new Map<number, boolean>()
   private ttlInMillis = 24 * 60 * 60 * 1000 // 1 day
 
   async start(): Promise<void> {
@@ -83,16 +84,18 @@ export default class RMQDataPublisher {
   private async findAndPublishEvents(): Promise<void> {
     const start = this.cycleCursor
     const end = this.cycleCursor + this.batchSize - 1
-    const cycles = (await queryCycleRecordsBetween(start, end)) || []
+    const cyclesFromDB = (await queryCycleRecordsBetween(start, end)) || []
 
-    if (cycles.length == 0) {
+    if (cyclesFromDB.length == 0) {
       console.log(`No cycles found for publishing: start: ${start} | end: ${end}`)
+      this.cycleCursor = end // if we don't set this, we'll end up stuck at a particular cursor
       return
     }
 
-    console.log(`Got cycles: ${cycles.length}`)
+    console.log(`Got cycles from DB: ${cyclesFromDB.length}`)
 
-    for (const cycle of cycles) {
+    const cycles = []
+    for (const cycle of cyclesFromDB) {
       const txMap = this.cycleVsTxMap.get(cycle.counter)
       if (txMap === null || txMap === undefined) {
         this.cycleVsTxMap.set(cycle.counter, new Map<string, TxData>())
@@ -102,6 +105,10 @@ export default class RMQDataPublisher {
       if (rcptMap === null || rcptMap === undefined) {
         this.cycleVsRcptMap.set(cycle.counter, new Map<string, ReceiptData>())
       }
+
+      if (!(this.cyclePublishedMap.get(cycle.counter) === true)) {
+        cycles.push(cycle)
+      }
     }
 
     const transactions = []
@@ -109,8 +116,8 @@ export default class RMQDataPublisher {
     const fetch = true
     const limit = 1000
 
+    let skip = 0
     while (fetch) {
-      let skip = 0
       const txns = (await queryOriginalTxsData(skip, limit, start, end)) as OriginalTxData[]
       console.log(`Got txns: ${txns.length} between cycles ${start} and ${end}`)
       // check for new or updated transactions
@@ -131,8 +138,8 @@ export default class RMQDataPublisher {
       skip += txns.length
     }
 
+    skip = 0
     while (fetch) {
-      let skip = 0
       const rcpts = await queryReceiptsBetweenCycles(skip, limit, start, end)
       console.log(`Got receipts: ${rcpts.length} between cycles ${start} and ${end}`)
       // check for new or updated receipts
@@ -184,6 +191,7 @@ export default class RMQDataPublisher {
   }
 
   private async publishCycles(cycles: CycleData[]): Promise<void> {
+    if (cycles.length <= 0) return
     const messages = []
     for (let i = 0; i < cycles.length; i++) {
       const cycle = cycles.at(i)
@@ -196,9 +204,15 @@ export default class RMQDataPublisher {
       })
     }
     await this.publishMessages(process.env.RMQ_CYCLES_EXCHANGE_NAME, messages)
+
+    for (let i = 0; i < cycles.length; i++) {
+      const cycle = cycles.at(i)
+      this.cyclePublishedMap.set(cycle.counter, true)
+    }
   }
 
   private async publishTransactions(transactions: OriginalTxData[]): Promise<void> {
+    if (transactions.length <= 0) return
     const messages = []
     for (let i = 0; i < transactions.length; i++) {
       messages.push({
@@ -206,9 +220,16 @@ export default class RMQDataPublisher {
       })
     }
     await this.publishMessages(process.env.RMQ_TRANSACTIONS_EXCHANGE_NAME, messages)
+
+    for (let i = 0; i < transactions.length; i++) {
+      const txn = transactions.at(i)
+      const txMap = this.cycleVsTxMap.get(txn.cycle)
+      txMap.set(txn.txId, new TxData(txn.txId, txn.timestamp))
+    }
   }
 
   private async publishReceipts(receipts: Receipt[]): Promise<void> {
+    if (receipts.length <= 0) return
     const messages = []
     for (let i = 0; i < receipts.length; i++) {
       messages.push({
@@ -216,6 +237,12 @@ export default class RMQDataPublisher {
       })
     }
     await this.publishMessages(process.env.RMQ_RECEIPTS_EXCHANGE_NAME, messages)
+
+    for (let i = 0; i < receipts.length; i++) {
+      const receipt = receipts.at(i)
+      const receiptMap = this.cycleVsRcptMap.get(receipt.cycle)
+      receiptMap.set(receipt.receiptId, new ReceiptData(receipt.receiptId, receipt.timestamp))
+    }
   }
 
   private async publishMessages(exchange: string, messages: unknown[]): Promise<void> {
@@ -331,6 +358,14 @@ export default class RMQDataPublisher {
     setInterval(
       () => {
         console.log(`Started in-memory clean up job`)
+
+        for (const key of this.cyclePublishedMap.keys()) {
+          if (key < this.cycleCursor - this.cycleConfirmThreshold) {
+            console.log(`Deleted cycle for key from memory: ${key}`)
+            this.cyclePublishedMap.delete(key)
+          }
+        }
+
         for (const key of this.cycleVsTxMap.keys()) {
           if (key < this.cycleCursor - this.cycleConfirmThreshold) {
             console.log(`Deleted txns for key from memory: ${key}`)
