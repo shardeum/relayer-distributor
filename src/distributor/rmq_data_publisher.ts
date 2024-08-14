@@ -170,7 +170,7 @@ export default class RMQDataPublisher {
     promises.push(this.publishReceipts(receipts))
     await Promise.all(promises)
 
-    // we wait for 3 cycles, before we move to cursor to next cycle
+    // we wait for this.cycleConfirmThreshold cycles, before we move to cursor to next cycle
     // note that this.batchSize for fetching cycles should always be greater than 3 or we will never fetch new cycles
     let updateCursor = false
     if (cycles.length >= this.cycleConfirmThreshold) {
@@ -182,6 +182,7 @@ export default class RMQDataPublisher {
     // we won't update cursor everytime
     const diff = Date.now() - this.cursorUpdatedAt
     if (updateCursor && diff >= this.cursorUpdateThresholdInMillis) {
+      this.cursorUpdatedAt = Date.now()
       CheckpointDao.upsertCheckpoint(
         this.checkpointDataType,
         distributorMode.MQ,
