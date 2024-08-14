@@ -17,6 +17,7 @@ export interface Config {
   VERBOSE: boolean
   DATA_LOG_DIR: string
   FILE_STREAM_INTERVAL_MS: number
+  NUMBER_OF_WORKERS: number
   MAX_CLIENTS_PER_CHILD: number
   limitToSubscribersOnly: boolean
   subscribers: [] | Subscriber[]
@@ -36,6 +37,7 @@ let config: Config = {
   RATE_LIMIT: 100, // 100 req per second,
   DATA_LOG_DIR: '../../../collector/data-logs', // Directory to store data log files written by archiver/collector
   FILE_STREAM_INTERVAL_MS: 100, // Check for new data every 100 ms
+  NUMBER_OF_WORKERS: 5,
   MAX_CLIENTS_PER_CHILD: 2,
   VERBOSE: false,
   limitToSubscribersOnly: false,
