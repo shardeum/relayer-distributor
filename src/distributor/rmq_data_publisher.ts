@@ -173,9 +173,9 @@ export default class RMQDataPublisher {
     // we wait for this.cycleConfirmThreshold cycles, before we move to cursor to next cycle
     // note that this.batchSize for fetching cycles should always be greater than 3 or we will never fetch new cycles
     let updateCursor = false
-    if (cycles.length >= this.cycleConfirmThreshold) {
+    if (cyclesFromDB.length >= this.cycleConfirmThreshold) {
       updateCursor = true
-      this.cycleCursor = cycles[cycles.length - this.cycleConfirmThreshold].counter
+      this.cycleCursor = cyclesFromDB[cyclesFromDB.length - this.cycleConfirmThreshold].counter
     }
 
     // update cursor
