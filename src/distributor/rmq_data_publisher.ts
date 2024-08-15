@@ -81,6 +81,10 @@ export default class RMQDataPublisher {
     }
   }
 
+  getCursorUpdatedAt(): number {
+    return this.cursorUpdatedAt
+  }
+
   private async findAndPublishEvents(): Promise<void> {
     const start = this.cycleCursor
     const end = this.cycleCursor + this.batchSize - 1

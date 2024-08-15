@@ -40,6 +40,7 @@
   "homepage": "https://gitlab.com/shardus/relayer/distributor#readme",
   "devDependencies": {
     "@types/amqplib": "^0.10.5",
+    "@types/axios": "^0.14.0",
     "@types/node": "18.16.1",
     "@types/node-fetch": "^2.5.4",
     "@types/socket.io": "^2.1.11",
@@ -69,6 +70,7 @@
     "@shardus/crypto-utils": "4.1.3",
     "@shardus/types": "1.2.13",
     "amqplib": "0.10.4",
+    "axios": "1.4.0",
     "deepmerge": "^4.2.2",
     "eslint": "^8.43.0",
     "fastify": "4.12.0",

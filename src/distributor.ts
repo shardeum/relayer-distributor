@@ -17,6 +17,8 @@ import {
 } from './distributor/utils'
 import RMQDataPublisher from './distributor/rmq_data_publisher'
 import { CheckpointDao } from './dbstore/checkpoints'
+import { initRMQModeHttpServer } from './distributor/rmq_mode_http_server'
+import RMQModeHeathCheck from './distributor/rmq_mode_health_check'
 
 const cluster = clusterModule as unknown as clusterModule.Cluster
 // Override default config params from config file, env vars, and cli args
@@ -126,11 +128,13 @@ const addSigListeners = (): void => {
 }
 
 const initDistributorMQMode = async (): Promise<void> => {
+  const rmqDataPublisher = new RMQDataPublisher()
+  const rmqHealthCheck = new RMQModeHeathCheck(rmqDataPublisher)
   initLogger()
   await dbstore.initializeDB(config)
   await CheckpointDao.init()
+  await initRMQModeHttpServer(rmqHealthCheck)
 
-  const rmqDataPublisher = new RMQDataPublisher()
   rmqDataPublisher.start()
 
   process.on('SIGTERM', async () => {
