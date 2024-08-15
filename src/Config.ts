@@ -34,6 +34,7 @@ export interface Config {
   limitToSubscribersOnly: boolean
   subscribers: [] | Subscriber[]
   distributorMode: string
+  MQ_DISTRIBUTOR_SERVER_PORT: number
 }
 
 let config: Config = {
@@ -63,6 +64,7 @@ let config: Config = {
   limitToSubscribersOnly: false,
   subscribers: [],
   distributorMode: process.env.DISTRIBUTOR_MODE || distributorMode.WS.toString(),
+  MQ_DISTRIBUTOR_SERVER_PORT: 6101,
 }
 
 export interface Subscriber {
