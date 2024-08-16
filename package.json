@@ -1,6 +1,6 @@
 {
   "name": "@shardus/distributor",
-  "version": "1.0.0.",
+  "version": "1.0.0",
   "description": "",
   "main": "./build/distributor.js",
   "types": "./build/distributor.d.ts",

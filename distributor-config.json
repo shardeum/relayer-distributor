@@ -6,6 +6,13 @@
   "DISTRIBUTOR_SECRET_KEY": "3be00019f23847529bd63e41124864983175063bb524bd54ea3c155f2fa12969758b1c119412298802cd28dbfa394cdfeecc4074492d60844cc192d632d84de3",
   "NUMBER_OF_WORKERS": 5,
   "ARCHIVER_DB_PATH": "archiverdb.sqlite3",
+  "ARCHIVER_DATA": {
+    "cycleDB": "cycles.sqlite3",
+    "accountDB": "accounts.sqlite3",
+    "transactionDB": "transactions.sqlite3",
+    "receiptDB": "receipts.sqlite3",
+    "originalTxDataDB": "originalTxsData.sqlite3"
+  },
   "DATA_LOG_DIR": "data-logs/127.0.0.1_4000",
   "FILE_STREAM_INTERVAL_MS": 100,
   "MAX_CLIENTS_PER_CHILD": 2,

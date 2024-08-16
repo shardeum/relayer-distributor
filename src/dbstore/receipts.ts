@@ -1,6 +1,6 @@
 import { Signature } from '@shardus/crypto-utils'
 import * as db from './sqlite3storage'
-import { extractValues, extractValuesFromArray } from './sqlite3storage'
+import { receiptDatabase, extractValues, extractValuesFromArray } from './sqlite3storage'
 import * as Logger from '../Logger'
 import { config } from '../Config'
 import { DeSerializeFromJsonString } from '../utils/serialization'
@@ -93,7 +93,7 @@ export async function insertReceipt(receipt: Receipt): Promise<void> {
       throw new Error('Failed to extract values from receipt')
     }
     const sql = 'INSERT OR REPLACE INTO receipts (' + fields + ') VALUES (' + placeholders + ')'
-    await db.run(sql, values)
+    await db.run(receiptDatabase, sql, values)
     if (config.VERBOSE) {
       Logger.mainLogger.debug('Successfully inserted Receipt', receipt.receiptId)
     }
@@ -118,7 +118,7 @@ export async function bulkInsertReceipts(receipts: Receipt[]): Promise<void> {
     for (let i = 1; i < receipts.length; i++) {
       sql = sql + ', (' + placeholders + ')'
     }
-    await db.run(sql, values)
+    await db.run(receiptDatabase, sql, values)
     Logger.mainLogger.debug('Successfully inserted Receipts', receipts.length)
   } catch (e) {
     Logger.mainLogger.error(e)
@@ -130,7 +130,7 @@ export async function queryReceiptByReceiptId(receiptId: string, timestamp = 0):
   try {
     const sql = `SELECT * FROM receipts WHERE receiptId=?` + (timestamp ? ` AND timestamp=?` : '')
     const value = timestamp ? [receiptId, timestamp] : [receiptId]
-    const receipt = (await db.get(sql, value)) as DBReceipt
+    const receipt = (await db.get(receiptDatabase, sql, value)) as DBReceipt
     if (receipt) deserializeDBReceipt(receipt)
     if (config.VERBOSE) {
       Logger.mainLogger.debug('Receipt receiptId', receipt)
@@ -145,7 +145,7 @@ export async function queryReceiptByReceiptId(receiptId: string, timestamp = 0):
 export async function queryLatestReceipts(count: number): Promise<Receipt[]> {
   try {
     const sql = `SELECT * FROM receipts ORDER BY cycle DESC, timestamp DESC LIMIT ${count ? count : 100}`
-    const receipts = (await db.all(sql)) as DBReceipt[]
+    const receipts = (await db.all(receiptDatabase, sql)) as DBReceipt[]
     if (receipts.length > 0) {
       receipts.forEach((receipt: DBReceipt) => {
         deserializeDBReceipt(receipt)
@@ -165,7 +165,7 @@ export async function queryReceipts(skip = 0, limit = 10000): Promise<Receipt[]>
   let receipts: Receipt[] = []
   try {
     const sql = `SELECT * FROM receipts ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
-    receipts = (await db.all(sql)) as DBReceipt[]
+    receipts = (await db.all(receiptDatabase, sql)) as DBReceipt[]
     if (receipts.length > 0) {
       receipts.forEach((receipt: DBReceipt) => {
         deserializeDBReceipt(receipt)
@@ -184,7 +184,7 @@ export async function queryReceiptCount(): Promise<number> {
   let receipts
   try {
     const sql = `SELECT COUNT(*) FROM receipts`
-    receipts = await db.get(sql, [])
+    receipts = await db.get(receiptDatabase, sql, [])
   } catch (e) {
     Logger.mainLogger.error(e)
   }
@@ -200,7 +200,7 @@ export async function queryReceiptCountByCycles(start: number, end: number): Pro
   let receipts
   try {
     const sql = `SELECT cycle, COUNT(*) FROM receipts GROUP BY cycle HAVING cycle BETWEEN ? AND ? ORDER BY cycle ASC`
-    receipts = await db.all(sql, [start, end])
+    receipts = await db.all(receiptDatabase, sql, [start, end])
   } catch (e) {
     Logger.mainLogger.error(e)
   }
@@ -223,7 +223,7 @@ export async function queryReceiptCountBetweenCycles(
   let receipts
   try {
     const sql = `SELECT COUNT(*) FROM receipts WHERE cycle BETWEEN ? AND ?`
-    receipts = await db.get(sql, [startCycleNumber, endCycleNumber])
+    receipts = await db.get(receiptDatabase, sql, [startCycleNumber, endCycleNumber])
   } catch (e) {
     console.log(e)
   }
@@ -244,7 +244,7 @@ export async function queryReceiptsBetweenCycles(
   let receipts: Receipt[] = []
   try {
     const sql = `SELECT * FROM receipts WHERE cycle BETWEEN ? AND ? ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
-    receipts = (await db.all(sql, [startCycleNumber, endCycleNumber])) as DBReceipt[]
+    receipts = (await db.all(receiptDatabase, sql, [startCycleNumber, endCycleNumber])) as DBReceipt[]
     if (receipts.length > 0) {
       receipts.forEach((receipt: DBReceipt) => {
         deserializeDBReceipt(receipt)

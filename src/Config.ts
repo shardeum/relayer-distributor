@@ -12,6 +12,13 @@ export interface Config {
   DISTRIBUTOR_PUBLIC_KEY: string
   DISTRIBUTOR_SECRET_KEY: string
   ARCHIVER_DB_PATH: string
+  ARCHIVER_DATA: {
+    cycleDB: string
+    accountDB: string
+    transactionDB: string
+    receiptDB: string
+    originalTxDataDB: string
+  }
   DISTRIBUTOR_LOGS: string
   RATE_LIMIT: number
   VERBOSE: boolean
@@ -33,6 +40,13 @@ let config: Config = {
     process.env.DISTRIBUTOR_SECRET_KEY ||
     '3be00019f23847529bd63e41124864983175063bb524bd54ea3c155f2fa12969758b1c119412298802cd28dbfa394cdfeecc4074492d60844cc192d632d84de3',
   ARCHIVER_DB_PATH: 'archiverdb.sqlite3',
+  ARCHIVER_DATA: {
+    cycleDB: 'cycles.sqlite3',
+    accountDB: 'accounts.sqlite3',
+    transactionDB: 'transactions.sqlite3',
+    receiptDB: 'receipts.sqlite3',
+    originalTxDataDB: 'originalTxsData.sqlite3',
+  },
   DISTRIBUTOR_LOGS: 'distributor-logs',
   RATE_LIMIT: 100, // 100 req per second,
   DATA_LOG_DIR: '../../../collector/data-logs', // Directory to store data log files written by archiver/collector

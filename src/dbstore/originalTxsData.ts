@@ -1,5 +1,5 @@
 import * as db from './sqlite3storage'
-import { extractValues, extractValuesFromArray } from './sqlite3storage'
+import { originalTxDataDatabase, extractValues, extractValuesFromArray } from './sqlite3storage'
 import * as Logger from '../Logger'
 import { config } from '../Config'
 import { DeSerializeFromJsonString } from '../utils/serialization'
@@ -30,7 +30,7 @@ export async function insertOriginalTxData(OriginalTxData: OriginalTxData): Prom
       throw new Error(`No values extracted from OriginalTxData with txId ${OriginalTxData.txId}`)
     }
     const sql = 'INSERT OR REPLACE INTO originalTxsData (' + fields + ') VALUES (' + placeholders + ')'
-    await db.run(sql, values)
+    await db.run(originalTxDataDatabase, sql, values)
     if (config.VERBOSE) {
       Logger.mainLogger.debug('Successfully inserted OriginalTxData', OriginalTxData.txId)
     }
@@ -57,7 +57,7 @@ export async function bulkInsertOriginalTxsData(originalTxsData: OriginalTxData[
     for (let i = 1; i < originalTxsData.length; i++) {
       sql = sql + ', (' + placeholders + ')'
     }
-    await db.run(sql, values)
+    await db.run(originalTxDataDatabase, sql, values)
     Logger.mainLogger.debug('Successfully inserted OriginalTxsData', originalTxsData.length)
   } catch (e) {
     Logger.mainLogger.error(e)
@@ -74,7 +74,7 @@ export async function queryOriginalTxDataCount(startCycle?: number, endCycle?: n
       sql += ` WHERE cycle BETWEEN ? AND ?`
       values.push(startCycle, endCycle)
     }
-    originalTxsData = await db.get(sql, values)
+    originalTxsData = await db.get(originalTxDataDatabase, sql, values)
   } catch (e) {
     console.log(e)
   }
@@ -100,7 +100,7 @@ export async function queryOriginalTxsData(
       values.push(startCycle, endCycle)
     }
     sql += sqlSuffix
-    originalTxsData = await db.all(sql, values)
+    originalTxsData = await db.all(originalTxDataDatabase, sql, values)
     originalTxsData.forEach((originalTxData: DBOriginalTxData) => {
       if (originalTxData.originalTxData)
         originalTxData.originalTxData = DeSerializeFromJsonString(originalTxData.originalTxData)
@@ -117,7 +117,7 @@ export async function queryOriginalTxsData(
 export async function queryOriginalTxDataByTxId(txId: string): Promise<OriginalTxData | null> {
   try {
     const sql = `SELECT * FROM originalTxsData WHERE txId=?`
-    const originalTxData = (await db.get(sql, [txId])) as DBOriginalTxData
+    const originalTxData = (await db.get(originalTxDataDatabase, sql, [txId])) as DBOriginalTxData
     if (originalTxData) {
       if (originalTxData.originalTxData)
         originalTxData.originalTxData = DeSerializeFromJsonString(originalTxData.originalTxData)
@@ -139,7 +139,7 @@ export async function queryOriginalTxDataCountByCycles(
   let originalTxsData
   try {
     const sql = `SELECT cycle, COUNT(*) FROM originalTxsData GROUP BY cycle HAVING cycle BETWEEN ? AND ? ORDER BY cycle ASC`
-    originalTxsData = await db.all(sql, [start, end])
+    originalTxsData = await db.all(originalTxDataDatabase, sql, [start, end])
   } catch (e) {
     Logger.mainLogger.error(e)
   }
@@ -160,7 +160,7 @@ export async function queryLatestOriginalTxs(count: number): Promise<DBOriginalT
     const sql = `SELECT * FROM originalTxsData ORDER BY cycle DESC, timestamp DESC LIMIT ${
       count ? count : 100
     }`
-    const originalTxs = (await db.all(sql)) as DBOriginalTxData[]
+    const originalTxs = (await db.all(originalTxDataDatabase, sql)) as DBOriginalTxData[]
     if (originalTxs.length > 0) {
       originalTxs.forEach((tx: DBOriginalTxData) => {
         if (tx.originalTxData) tx.originalTxData = DeSerializeFromJsonString(tx.originalTxData)
