@@ -6,7 +6,6 @@ import * as amqp from 'amqplib'
 import { queryOriginalTxsData } from '../../../src/dbstore/originalTxsData'
 import { queryReceiptsBetweenCycles } from '../../../src/dbstore/receipts'
 import * as Crypto from '../../../src/utils/Crypto'
-import { sign } from 'crypto'
 import { distributorMode } from '../../../src/Config'
 
 jest.mock('amqplib', () => ({
