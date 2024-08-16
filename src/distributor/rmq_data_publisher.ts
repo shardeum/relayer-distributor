@@ -47,6 +47,8 @@ export default class RMQDataPublisher {
   private cyclePublishedMap = new Map<number, boolean>()
   private ttlInMillis = 24 * 60 * 60 * 1000 // 1 day
 
+  private cleanUpJobInterval: NodeJS.Timeout | null
+
   async start(): Promise<void> {
     await this.connect()
 
@@ -64,6 +66,9 @@ export default class RMQDataPublisher {
         `[RMQDataPublisher] Started job to publish events to RMQ. isConnClosing: ${this.isConnClosing} | isConnected: ${this.isConnected}`
       )
       if (this.isConnClosing) {
+        if (this.cleanUpJobInterval != null) {
+          clearInterval(this.cleanUpJobInterval)
+        }
         return
       }
       if (!this.isConnected) {
@@ -96,7 +101,7 @@ export default class RMQDataPublisher {
       return
     }
 
-    console.log(`Got cycles from DB: ${cyclesFromDB.length}`)
+    console.log(`Got cycles from DB: ${cyclesFromDB.length} between cycles ${start} and ${end}`)
 
     const cycles = []
     for (const cycle of cyclesFromDB) {
@@ -360,7 +365,7 @@ export default class RMQDataPublisher {
   }
 
   private async startInMemoryMapCleanupJob(): Promise<void> {
-    setInterval(
+    this.cleanUpJobInterval = setInterval(
       () => {
         console.log(`Started in-memory clean up job`)
 
