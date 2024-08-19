@@ -2,8 +2,8 @@
   "name": "@shardus/distributor",
   "version": "1.0.0",
   "description": "",
-  "main": "./build/distributor.js",
-  "types": "./build/distributor.d.ts",
+  "main": "./build/src/distributor.js",
+  "types": "./build/src/distributor.d.ts",
   "files": [
     "build/**/*",
     "distributor-log.json"
@@ -20,7 +20,7 @@
     "prepare": "npm run compile",
     "pretest": "npm run compile",
     "posttest": "npm run check",
-    "start": "npm run prepare && node build/distributor.js",
+    "start": "npm run prepare && node build/src/distributor.js",
     "lint": "eslint \"./src/**/*.ts\"",
     "format-check": "prettier --check \"./src/**/*.ts\"",
     "format-fix": "prettier --write \"./src/**/*.ts\""
