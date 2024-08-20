@@ -2,26 +2,18 @@ import * as http from 'http'
 import * as Logger from '../Logger'
 
 import { config } from '../Config'
+import { Server, IncomingMessage, ServerResponse } from 'http'
 import fastifyCors from '@fastify/cors'
-import Fastify, { FastifyInstance } from 'fastify'
+import fastify, { FastifyInstance } from 'fastify'
 import fastifyRateLimit from '@fastify/rate-limit'
 import { Utils as StringUtils } from '@shardus/types'
 import { registerRoutes } from '../api'
 import RMQModeHeathCheck from './rmq_mode_health_check'
 
-let httpServer: http.Server
-
 export const initRMQModeHttpServer = async (rmqHealthCheck: RMQModeHeathCheck): Promise<void> => {
-  const serverFactory = (
-    handler: (req: http.IncomingMessage, res: http.ServerResponse) => void
-  ): http.Server => {
-    httpServer = http.createServer((req, res) => {
-      handler(req, res)
-    })
-    return httpServer
-  }
-
-  const fastifyServer = Fastify({ serverFactory })
+  const fastifyServer: FastifyInstance<Server, IncomingMessage, ServerResponse> = fastify({
+    logger: false,
+  })
   await fastifyServer.register(fastifyCors)
   await fastifyServer.register(fastifyRateLimit, {
     global: true,
@@ -62,15 +54,18 @@ export const initRMQModeHttpServer = async (rmqHealthCheck: RMQModeHeathCheck): 
   registerRoutes(fastifyServer as FastifyInstance<http.Server, http.IncomingMessage, http.ServerResponse>)
 
   // Start server and bind to port on all interfaces
-  fastifyServer.ready(() => {
-    httpServer.listen(config.MQ_DISTRIBUTOR_SERVER_PORT, () => {
-      Logger.mainLogger.info(`MQ Distributor-Server listening on port ${config.MQ_DISTRIBUTOR_SERVER_PORT}.`)
-      return
-    })
-
-    httpServer.on('error', (err) => {
-      Logger.mainLogger.error('MQ Distributor server failed to start.', err)
-      process.exit(1)
-    })
-  })
+  fastifyServer.listen(
+    {
+      port: config.MQ_DISTRIBUTOR_SERVER_PORT,
+      host: '0.0.0.0',
+    },
+    (err) => {
+      Logger.mainLogger.debug('MQ Distributor-Server listening on port', config.MQ_DISTRIBUTOR_SERVER_PORT)
+      if (err) {
+        fastifyServer.log.error(err)
+        process.exit(1)
+      }
+      Logger.mainLogger.debug('MQ Distributor-Server started')
+    }
+  )
 }
