@@ -131,7 +131,11 @@ export default class RMQDataPublisher {
       console.log(`Got txns: ${txns.length} between cycles ${start} and ${end}`)
       // check for new or updated transactions
       for (const txn of txns) {
-        const txMap = this.cycleVsTxMap.get(txn.cycle)
+        let txMap = this.cycleVsTxMap.get(txn.cycle)
+        if (txMap === null || txMap === undefined) {
+          this.cycleVsTxMap.set(txn.cycle, new Map<string, TxData>())
+          txMap = this.cycleVsTxMap.get(txn.cycle)
+        }
         const txData = txMap.get(txn.txId)
         if (txData === null || txData === undefined) {
           txMap.set(txn.txId, new TxData(txn.txId, txn.timestamp))
@@ -153,7 +157,11 @@ export default class RMQDataPublisher {
       console.log(`Got receipts: ${rcpts.length} between cycles ${start} and ${end}`)
       // check for new or updated receipts
       for (const receipt of rcpts) {
-        const receiptMap = this.cycleVsRcptMap.get(receipt.cycle)
+        let receiptMap = this.cycleVsRcptMap.get(receipt.cycle)
+        if (receiptMap === null || receiptMap === undefined) {
+          this.cycleVsRcptMap.set(receipt.cycle, new Map<string, ReceiptData>())
+          receiptMap = this.cycleVsRcptMap.get(receipt.cycle)
+        }
         const receiptData = receiptMap.get(receipt.receiptId)
         if (receiptData === null || receiptData === undefined) {
           receiptMap.set(receipt.receiptId, new ReceiptData(receipt.receiptId, receipt.timestamp))
