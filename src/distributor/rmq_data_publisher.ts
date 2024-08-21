@@ -237,7 +237,7 @@ export default class RMQDataPublisher {
         originalTx: transactions.at(i),
       })
     }
-    await this.publishMessages(process.env.RMQ_TRANSACTIONS_EXCHANGE_NAME, messages)
+    await this.publishMessages(process.env.RMQ_ORIGINAL_TXS_EXCHANGE_NAME, messages)
 
     for (let i = 0; i < transactions.length; i++) {
       const txn = transactions.at(i)

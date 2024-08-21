@@ -21,6 +21,7 @@
     "pretest": "npm run compile",
     "posttest": "npm run check",
     "start": "npm run prepare && node build/src/distributor.js",
+    "apis": "npm run prepare && node build/src/rmq_api_server.js",
     "lint": "eslint \"./src/**/*.ts\"",
     "format-check": "prettier --check \"./src/**/*.ts\"",
     "format-fix": "prettier --write \"./src/**/*.ts\""

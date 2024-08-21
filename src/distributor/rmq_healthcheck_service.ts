@@ -6,9 +6,9 @@ import RMQDataPublisher from './rmq_data_publisher'
 import axios, { AxiosError } from 'axios'
 
 class DistributorHealthResp {
-  lastCycleInArchiver: number | null
+  lastCycleInDistributorDB: number | null
   lastCyclePublishedByDistributor: number | null
-  lastCyclePublishedTimestamp: number | null
+  lastCycleCursorUpdatedTimestamp: number | null
 }
 
 class CollectorHealthResp {
@@ -42,14 +42,14 @@ export default class RMQModeHeathCheck {
 
     const distributorHealthResp = new DistributorHealthResp()
     if (cycles.length > 0) {
-      distributorHealthResp.lastCycleInArchiver = cycles[0].counter
+      distributorHealthResp.lastCycleInDistributorDB = cycles[0].counter
     }
 
     if (checkpoint != null) {
       distributorHealthResp.lastCyclePublishedByDistributor = parseInt(checkpoint.cursor)
     }
 
-    distributorHealthResp.lastCyclePublishedTimestamp = this.rmqPublisher.getCursorUpdatedAt()
+    distributorHealthResp.lastCycleCursorUpdatedTimestamp = this.rmqPublisher.getCursorUpdatedAt()
 
     return distributorHealthResp
   }
@@ -67,7 +67,7 @@ export default class RMQModeHeathCheck {
 
     const queueBindingsForCycles = await this.getQueues(process.env.RMQ_CYCLES_EXCHANGE_NAME)
     const queueBindingsForReceipts = await this.getQueues(process.env.RMQ_RECEIPTS_EXCHANGE_NAME)
-    const queueBindingsForTxs = await this.getQueues(process.env.RMQ_TRANSACTIONS_EXCHANGE_NAME)
+    const queueBindingsForTxs = await this.getQueues(process.env.RMQ_ORIGINAL_TXS_EXCHANGE_NAME)
 
     for (const queue of queueBindingsForCycles) {
       const metrics = await this.getQueueMetrics(queue)

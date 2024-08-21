@@ -1,4 +1,3 @@
-import * as http from 'http'
 import * as Logger from '../Logger'
 
 import { config } from '../Config'
@@ -7,8 +6,7 @@ import fastifyCors from '@fastify/cors'
 import fastify, { FastifyInstance } from 'fastify'
 import fastifyRateLimit from '@fastify/rate-limit'
 import { Utils as StringUtils } from '@shardus/types'
-import { registerRoutes } from '../api'
-import RMQModeHeathCheck from './rmq_mode_health_check'
+import RMQModeHeathCheck from './rmq_healthcheck_service'
 
 export const initRMQModeHttpServer = async (rmqHealthCheck: RMQModeHeathCheck): Promise<void> => {
   const fastifyServer: FastifyInstance<Server, IncomingMessage, ServerResponse> = fastify({
@@ -50,9 +48,6 @@ export const initRMQModeHttpServer = async (rmqHealthCheck: RMQModeHeathCheck): 
     return StringUtils.safeStringify(payload)
   })
 
-  // Register API routes
-  registerRoutes(fastifyServer as FastifyInstance<http.Server, http.IncomingMessage, http.ServerResponse>)
-
   // Start server and bind to port on all interfaces
   fastifyServer.listen(
     {
@@ -60,12 +55,12 @@ export const initRMQModeHttpServer = async (rmqHealthCheck: RMQModeHeathCheck): 
       host: '0.0.0.0',
     },
     (err) => {
-      Logger.mainLogger.debug('MQ Distributor-Server listening on port', config.MQ_DISTRIBUTOR_SERVER_PORT)
+      Logger.mainLogger.debug('MQ Health Check Server listening on port', config.MQ_DISTRIBUTOR_SERVER_PORT)
       if (err) {
         fastifyServer.log.error(err)
         process.exit(1)
       }
-      Logger.mainLogger.debug('MQ Distributor-Server started')
+      Logger.mainLogger.debug('MQ Health Check started')
     }
   )
 }
