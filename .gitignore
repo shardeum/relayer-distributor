@@ -9,3 +9,4 @@ archiverdb.sqlite3-shm
 archiverdb.sqlite3-wal
 
 distributor.log
+db
