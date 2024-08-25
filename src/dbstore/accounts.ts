@@ -1,5 +1,5 @@
 import * as db from './sqlite3storage'
-import { accountDatabase, extractValues, extractValuesFromArray } from './sqlite3storage'
+import { accountDatabase } from '.'
 import * as Logger from '../Logger'
 import { config } from '../Config'
 import { DeSerializeFromJsonString, SerializeToJsonString } from '../utils/serialization'
@@ -22,7 +22,7 @@ export async function insertAccount(account: AccountCopy): Promise<void> {
   try {
     const fields = Object.keys(account).join(', ')
     const placeholders = Object.keys(account).fill('?').join(', ')
-    const values = extractValues(account)
+    const values = db.extractValues(account)
     if (!values || values.length === 0) {
       throw new Error(`No values extracted from account ${account.accountId}`)
     }
@@ -44,7 +44,7 @@ export async function bulkInsertAccounts(accounts: AccountCopy[]): Promise<void>
   try {
     const fields = Object.keys(accounts[0]).join(', ')
     const placeholders = Object.keys(accounts[0]).fill('?').join(', ')
-    const values = extractValuesFromArray(accounts)
+    const values = db.extractValuesFromArray(accounts)
     if (!values || values.length === 0) {
       throw new Error(`No values extracted from accounts. Number of accounts: ${accounts.length}`)
     }

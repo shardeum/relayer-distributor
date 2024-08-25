@@ -1,5 +1,5 @@
 import * as db from './sqlite3storage'
-import { cycleDatabase, extractValues, extractValuesFromArray } from './sqlite3storage'
+import { cycleDatabase } from '.'
 import { P2P, StateManager } from '@shardus/types'
 import * as Logger from '../Logger'
 import { config } from '../Config'
@@ -19,7 +19,7 @@ export async function insertCycle(cycle: Cycle): Promise<void> {
   try {
     const fields = Object.keys(cycle).join(', ')
     const placeholders = Object.keys(cycle).fill('?').join(', ')
-    const values = extractValues(cycle)
+    const values = db.extractValues(cycle)
     if (!values || values.length === 0) {
       throw new Error(`No values extracted from cycle ${cycle.cycleRecord.counter}`)
     }
@@ -40,7 +40,7 @@ export async function bulkInsertCycles(cycles: Cycle[]): Promise<void> {
   try {
     const fields = Object.keys(cycles[0]).join(', ')
     const placeholders = Object.keys(cycles[0]).fill('?').join(', ')
-    const values = extractValuesFromArray(cycles)
+    const values = db.extractValuesFromArray(cycles)
     if (!values || values.length === 0) {
       throw new Error(`No values extracted from cycles. Number of cycles: ${cycles.length}`)
     }

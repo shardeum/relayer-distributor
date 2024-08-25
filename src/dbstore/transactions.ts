@@ -1,5 +1,5 @@
 import * as db from './sqlite3storage'
-import { transactionDatabase, extractValues, extractValuesFromArray } from './sqlite3storage'
+import { transactionDatabase } from '.'
 import * as Logger from '../Logger'
 import { config } from '../Config'
 import { DeSerializeFromJsonString } from '../utils/serialization'
@@ -26,7 +26,7 @@ export async function insertTransaction(transaction: Transaction): Promise<void>
   try {
     const fields = Object.keys(transaction).join(', ')
     const placeholders = Object.keys(transaction).fill('?').join(', ')
-    const values = extractValues(transaction) // Ensure values is always an array
+    const values = db.extractValues(transaction) // Ensure values is always an array
     if (!values || values.length === 0) {
       throw new Error(`No values extracted from transaction with txId ${transaction.txId}`)
     }
@@ -48,7 +48,7 @@ export async function bulkInsertTransactions(transactions: Transaction[]): Promi
   try {
     const fields = Object.keys(transactions[0]).join(', ')
     const placeholders = Object.keys(transactions[0]).fill('?').join(', ')
-    const values = extractValuesFromArray(transactions) || []
+    const values = db.extractValuesFromArray(transactions) || []
     if (!values || values.length === 0) {
       throw new Error(`No values extracted from transactions. Number of transactions: ${transactions.length}`)
     }
