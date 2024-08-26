@@ -3,6 +3,7 @@ import { originalTxDataDatabase } from '.'
 import * as Logger from '../Logger'
 import { config } from '../Config'
 import { DeSerializeFromJsonString } from '../utils/serialization'
+import { isNumber } from '../utils/Utils'
 
 export interface OriginalTxData {
   txId: string
@@ -96,7 +97,7 @@ export async function queryOriginalTxsData(
     let sql = `SELECT * FROM originalTxsData`
     const sqlSuffix = ` ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
     const values: number[] = []
-    if (startCycle >= 0 && endCycle >= 0) {
+    if (!isNumber(startCycle) && !isNumber(endCycle)) {
       sql += ` WHERE cycle BETWEEN ? AND ?`
       values.push(startCycle, endCycle)
     }

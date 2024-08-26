@@ -1,7 +1,7 @@
 import * as WebSocket from 'ws'
 import * as Crypto from '../utils/Crypto'
 import { join } from 'path'
-import { config, distributorMode, overrideDefaultConfig } from '../Config'
+import { config, overrideDefaultConfig } from '../Config'
 import DataLogReader from '../log-reader'
 import { Utils as StringUtils } from '@shardus/types'
 

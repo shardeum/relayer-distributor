@@ -75,3 +75,10 @@ export function validateTypes(inp: object, def: object): string {
 export function isUndefined(thing: unknown): boolean {
   return typeof thing === 'undefined'
 }
+
+/**
+ * Checks whether the given thing is a Number
+ */
+export function isNumber(thing: unknown): boolean {
+  return typeof thing === 'number' && !Number.isNaN(thing)
+}
