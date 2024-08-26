@@ -5,7 +5,7 @@
   "DISTRIBUTOR_PUBLIC_KEY": "758b1c119412298802cd28dbfa394cdfeecc4074492d60844cc192d632d84de3",
   "DISTRIBUTOR_SECRET_KEY": "3be00019f23847529bd63e41124864983175063bb524bd54ea3c155f2fa12969758b1c119412298802cd28dbfa394cdfeecc4074492d60844cc192d632d84de3",
   "NUMBER_OF_WORKERS": 5,
-  "ARCHIVER_DB_PATH": "archiverdb.sqlite3",
+  "ARCHIVER_DB_DIR": "archiver-db",
   "ARCHIVER_DATA": {
     "cycleDB": "cycles.sqlite3",
     "accountDB": "accounts.sqlite3",

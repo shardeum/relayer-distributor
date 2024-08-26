@@ -11,7 +11,7 @@ export interface Config {
   DISTRIBUTOR_HASH_KEY: string
   DISTRIBUTOR_PUBLIC_KEY: string
   DISTRIBUTOR_SECRET_KEY: string
-  ARCHIVER_DB_PATH: string
+  ARCHIVER_DB_DIR: string
   ARCHIVER_DATA: {
     cycleDB: string
     accountDB: string
@@ -39,7 +39,7 @@ let config: Config = {
   DISTRIBUTOR_SECRET_KEY:
     process.env.DISTRIBUTOR_SECRET_KEY ||
     '3be00019f23847529bd63e41124864983175063bb524bd54ea3c155f2fa12969758b1c119412298802cd28dbfa394cdfeecc4074492d60844cc192d632d84de3',
-  ARCHIVER_DB_PATH: 'archiverdb.sqlite3',
+  ARCHIVER_DB_DIR: 'archiverdb.sqlite3',
   ARCHIVER_DATA: {
     cycleDB: 'cycles.sqlite3',
     accountDB: 'accounts.sqlite3',

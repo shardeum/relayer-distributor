@@ -9,15 +9,15 @@ export let receiptDatabase: Database
 export let originalTxDataDatabase: Database
 
 export const initializeDB = async (config: Config): Promise<void> => {
-  accountDatabase = await createDB(`${config.ARCHIVER_DB_PATH}/${config.ARCHIVER_DATA.accountDB}`, 'Account')
-  cycleDatabase = await createDB(`${config.ARCHIVER_DB_PATH}/${config.ARCHIVER_DATA.cycleDB}`, 'Cycle')
+  accountDatabase = await createDB(`${config.ARCHIVER_DB_DIR}/${config.ARCHIVER_DATA.accountDB}`, 'Account')
+  cycleDatabase = await createDB(`${config.ARCHIVER_DB_DIR}/${config.ARCHIVER_DATA.cycleDB}`, 'Cycle')
   transactionDatabase = await createDB(
-    `${config.ARCHIVER_DB_PATH}/${config.ARCHIVER_DATA.transactionDB}`,
+    `${config.ARCHIVER_DB_DIR}/${config.ARCHIVER_DATA.transactionDB}`,
     'Transaction'
   )
-  receiptDatabase = await createDB(`${config.ARCHIVER_DB_PATH}/${config.ARCHIVER_DATA.receiptDB}`, 'Receipt')
+  receiptDatabase = await createDB(`${config.ARCHIVER_DB_DIR}/${config.ARCHIVER_DATA.receiptDB}`, 'Receipt')
   originalTxDataDatabase = await createDB(
-    `${config.ARCHIVER_DB_PATH}/${config.ARCHIVER_DATA.originalTxDataDB}`,
+    `${config.ARCHIVER_DB_DIR}/${config.ARCHIVER_DATA.originalTxDataDB}`,
     'OriginalTxData'
   )
   // TODO: Check if the database have the required tables and they are in the same format as the original version in the archiver
