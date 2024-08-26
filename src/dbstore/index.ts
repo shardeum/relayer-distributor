@@ -1,6 +1,6 @@
 import { Config } from '../Config'
 import { Database } from 'sqlite3'
-import { close, createDB } from './sqlite3storage'
+import { close, readFromDB } from './sqlite3storage'
 
 export let cycleDatabase: Database
 export let accountDatabase: Database
@@ -9,14 +9,14 @@ export let receiptDatabase: Database
 export let originalTxDataDatabase: Database
 
 export const initializeDB = async (config: Config): Promise<void> => {
-  accountDatabase = await createDB(`${config.ARCHIVER_DB_DIR}/${config.ARCHIVER_DATA.accountDB}`, 'Account')
-  cycleDatabase = await createDB(`${config.ARCHIVER_DB_DIR}/${config.ARCHIVER_DATA.cycleDB}`, 'Cycle')
-  transactionDatabase = await createDB(
+  accountDatabase = await readFromDB(`${config.ARCHIVER_DB_DIR}/${config.ARCHIVER_DATA.accountDB}`, 'Account')
+  cycleDatabase = await readFromDB(`${config.ARCHIVER_DB_DIR}/${config.ARCHIVER_DATA.cycleDB}`, 'Cycle')
+  transactionDatabase = await readFromDB(
     `${config.ARCHIVER_DB_DIR}/${config.ARCHIVER_DATA.transactionDB}`,
     'Transaction'
   )
-  receiptDatabase = await createDB(`${config.ARCHIVER_DB_DIR}/${config.ARCHIVER_DATA.receiptDB}`, 'Receipt')
-  originalTxDataDatabase = await createDB(
+  receiptDatabase = await readFromDB(`${config.ARCHIVER_DB_DIR}/${config.ARCHIVER_DATA.receiptDB}`, 'Receipt')
+  originalTxDataDatabase = await readFromDB(
     `${config.ARCHIVER_DB_DIR}/${config.ARCHIVER_DATA.originalTxDataDB}`,
     'OriginalTxData'
   )

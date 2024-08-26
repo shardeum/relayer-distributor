@@ -4,7 +4,7 @@ import { DBCycle, Cycle } from './cycles'
 import { Receipt, DBReceipt } from './receipts'
 import { OriginalTxData } from './originalTxsData'
 import { DBTransaction, Transaction } from './transactions'
-import { DBAccount, AccountCopy } from './accounts'
+import { DBAccount, AccountsCopy } from './accounts'
 
 export interface DBOriginalTxData {
   txId: string
@@ -24,10 +24,10 @@ type DBRecord =
   | OriginalTxData
   | Transaction
   | DBAccount
-  | AccountCopy
+  | AccountsCopy
 
-export const createDB = async (dbPath: string, dbName: string): Promise<Database> => {
-  console.log('CreateDB: dbName: ', dbName, 'dbPath: ', dbPath)
+export const readFromDB = async (dbPath: string, dbName: string): Promise<Database> => {
+  console.log('Read From DB -> dbName: ', dbName, 'dbPath: ', dbPath)
   const db = new Database(dbPath, (err) => {
     if (err) {
       console.log('❌ Error opening database:', err)

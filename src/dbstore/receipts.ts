@@ -4,7 +4,25 @@ import { receiptDatabase } from '.'
 import * as Logger from '../Logger'
 import { config } from '../Config'
 import { DeSerializeFromJsonString } from '../utils/serialization'
-import * as Account from '../dbstore/accounts'
+import { AccountsCopy } from '../dbstore/accounts'
+
+export type Proposal = {
+  applied: boolean
+  cant_preApply: boolean
+  accountIDs: string[]
+  beforeStateHashes: string[]
+  afterStateHashes: string[]
+  appReceiptDataHash: string
+  txid: string
+}
+
+export type SignedReceipt = {
+  proposal: Proposal
+  proposalHash: string // Redundant, may go
+  signaturePack: Signature[]
+  voteOffsets: number[]
+  sign?: Signature
+}
 
 // We might have to move type definitions to a separate place
 
@@ -18,10 +36,10 @@ export interface ArchiverReceipt {
     timestamp: number
   }
   cycle: number
-  beforeStateAccounts: Account.AccountCopy[]
-  accounts: Account.AccountCopy[]
-  appReceiptData: object & { accountId?: string; data: object }
-  appliedReceipt: AppliedReceipt2
+  signedReceipt: SignedReceipt
+  afterStates?: AccountsCopy[]
+  beforeStates?: AccountsCopy[]
+  appReceiptData: any
   executionShardKey: string
   globalModification: boolean
 }
@@ -69,14 +87,15 @@ export type ConfirmOrChallengeMessage = {
 export interface Receipt extends ArchiverReceipt {
   receiptId: string
   timestamp: number
+  applyTimestamp: number
 }
 
 export type DBReceipt = Receipt & {
   tx: string
-  beforeStateAccounts: string
-  accounts: string
+  afterStates: string
+  beforeStates: string
+  signedReceipt: string
   appReceiptData: string | null
-  appliedReceipt: string
 }
 
 export interface ReceiptsCountByCycle {
@@ -265,12 +284,12 @@ export async function queryReceiptsBetweenCycles(
 }
 
 function deserializeDBReceipt(receipt: DBReceipt): void {
-  if (receipt.tx) receipt.tx = DeSerializeFromJsonString(receipt.tx)
-  if (receipt.beforeStateAccounts)
-    receipt.beforeStateAccounts = DeSerializeFromJsonString(receipt.beforeStateAccounts)
-  if (receipt.accounts) receipt.accounts = DeSerializeFromJsonString(receipt.accounts)
-  if (receipt.appReceiptData) receipt.appReceiptData = DeSerializeFromJsonString(receipt.appReceiptData)
-  if (receipt.appliedReceipt) receipt.appliedReceipt = DeSerializeFromJsonString(receipt.appliedReceipt)
+  receipt.tx &&= DeSerializeFromJsonString(receipt.tx)
+  receipt.afterStates &&= DeSerializeFromJsonString(receipt.afterStates)
+  receipt.beforeStates &&= DeSerializeFromJsonString(receipt.beforeStates)
+  receipt.signedReceipt &&= DeSerializeFromJsonString(receipt.signedReceipt)
+  receipt.appReceiptData &&= DeSerializeFromJsonString(receipt.appReceiptData)
+
   // globalModification is stored as 0 or 1 in the database, convert it to boolean
   receipt.globalModification = (receipt.globalModification as unknown as number) === 1
 }
