@@ -3,7 +3,7 @@ import * as net from 'net'
 import * as http from 'http'
 import * as Logger from '../Logger'
 
-import { config } from '../Config'
+import { config, distributorMode } from '../Config'
 import DataLogReader from '../log-reader'
 import fastifyCors from '@fastify/cors'
 import type { Worker } from 'node:cluster'
@@ -121,6 +121,9 @@ const initSocketServer = async (httpServer: http.Server, worker: Worker): Promis
 
 export const initWorker = async (): Promise<void> => {
   try {
+    if (config.distributorMode === distributorMode.MQ) {
+      return
+    }
     const DATA_LOG_PATH = config.DATA_LOG_DIR
     const cycleReader = new DataLogReader(DATA_LOG_PATH, 'cycle')
     const receiptReader = new DataLogReader(DATA_LOG_PATH, 'receipt')
