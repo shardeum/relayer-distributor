@@ -24,9 +24,11 @@ export const initializeDB = async (config: Config): Promise<void> => {
 }
 
 export const closeDatabases = async (): Promise<void> => {
-  await close(cycleDatabase, 'Cycle')
-  await close(accountDatabase, 'Account')
-  await close(receiptDatabase, 'Receipt')
-  await close(transactionDatabase, 'Transaction')
-  await close(originalTxDataDatabase, 'OriginalTxData')
+  const promises = []
+  promises.push(close(accountDatabase, 'Account'))
+  promises.push(close(transactionDatabase, 'Transaction'))
+  promises.push(close(cycleDatabase, 'Cycle'))
+  promises.push(close(receiptDatabase, 'Receipt'))
+  promises.push(close(originalTxDataDatabase, 'OriginalTxData'))
+  await Promise.all(promises)
 }

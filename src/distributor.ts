@@ -113,12 +113,12 @@ const addSigListeners = (): void => {
   })
   process.on('SIGINT', async () => {
     console.log('Exiting on SIGINT')
-    await dbstore.closeDatabases()
+    if (!cluster.isPrimary) await dbstore.closeDatabases()
     process.exit(0)
   })
   process.on('SIGTERM', async () => {
     console.log('Exiting on SIGTERM')
-    await dbstore.closeDatabases()
+    if (!cluster.isPrimary) await dbstore.closeDatabases()
     process.exit(0)
   })
   process.on('uncaughtException', (error) => {
