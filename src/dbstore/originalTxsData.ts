@@ -97,7 +97,7 @@ export async function queryOriginalTxsData(
     let sql = `SELECT * FROM originalTxsData`
     const sqlSuffix = ` ORDER BY cycle ASC, timestamp ASC LIMIT ${limit} OFFSET ${skip}`
     const values: number[] = []
-    if (!isNumber(startCycle) && !isNumber(endCycle)) {
+    if (isNumber(startCycle) && isNumber(endCycle)) {
       sql += ` WHERE cycle BETWEEN ? AND ?`
       values.push(startCycle, endCycle)
     }
