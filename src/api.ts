@@ -172,6 +172,15 @@ export function registerRoutes(server: FastifyInstance<Server, IncomingMessage, 
       let txIdListArr: string[] = []
       try {
         txIdListArr = StringUtils.safeJsonParse(txIdList)
+        if (txIdListArr && txIdListArr.length > MAX_ORIGINAL_TXS_PER_REQUEST) {
+          reply.send(
+            Crypto.sign({
+              success: false,
+              error: `Exceed maximum limit of ${MAX_ORIGINAL_TXS_PER_REQUEST} original transactions`,
+            })
+          )
+          return
+        }
       } catch (e) {
         reply.send(
           Crypto.sign({
@@ -310,6 +319,15 @@ export function registerRoutes(server: FastifyInstance<Server, IncomingMessage, 
       let txIdListArr: string[] = []
       try {
         txIdListArr = StringUtils.safeJsonParse(txIdList)
+        if (txIdListArr && txIdListArr.length > MAX_RECEIPTS_PER_REQUEST) {
+          reply.send(
+            Crypto.sign({
+              success: false,
+              error: `Exceed maximum limit of ${MAX_RECEIPTS_PER_REQUEST} receipts`,
+            })
+          )
+          return
+        }
       } catch (e) {
         reply.send(
           Crypto.sign({
