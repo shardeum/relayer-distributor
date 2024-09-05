@@ -19,6 +19,7 @@ import RMQDataPublisher from './distributor/rmq_data_publisher'
 import { CheckpointDao } from './dbstore/checkpoints'
 import { initRMQModeHttpServer } from './distributor/rmq_healthcheck_server'
 import RMQModeHeathCheck from './distributor/rmq_healthcheck_service'
+import { setInitialDataLogReaderMetrics } from './metrics'
 
 const cluster = clusterModule as unknown as clusterModule.Cluster
 // Override default config params from config file, env vars, and cli args
@@ -82,6 +83,7 @@ const initDistributor = async (): Promise<void> => {
     }
     // Worker Process Logic
     await dbstore.initializeDB(config)
+    await setInitialDataLogReaderMetrics()
     const { worker } = cluster
     await initHttpServer(worker)
     console.log(

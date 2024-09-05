@@ -4,6 +4,7 @@ import { join } from 'path'
 import { config, overrideDefaultConfig } from '../Config'
 import DataLogReader from '../log-reader'
 import { Utils as StringUtils } from '@shardus/types'
+import { incrementCycleCount, incrementOriginalTxCount, incrementReceiptCount } from '../metrics'
 
 const FILE = join(process.cwd(), 'distributor-config.json')
 overrideDefaultConfig(FILE, process.env, process.argv)
@@ -105,12 +106,15 @@ export const registerDataReaderListeners = (reader: DataLogReader): void => {
       switch (reader.dataName) {
         case 'cycle':
           data.cycle = logData
+          incrementCycleCount()
           break
         case 'receipt':
           data.receipt = logData
+          incrementReceiptCount()
           break
         case 'originalTx':
           data.originalTx = logData
+          incrementOriginalTxCount()
           break
       }
       sendDataToAllClients({

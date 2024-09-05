@@ -12,6 +12,7 @@ import * as ReceiptDB from './dbstore/receipts'
 import * as OriginalTxDB from './dbstore/originalTxsData'
 import { distributorSubscribers } from './distributor/utils'
 import { Utils as StringUtils } from '@shardus/types'
+import { getDataLogReaderMetrics } from './metrics'
 
 const TXID_LENGTH = 64
 export const MAX_ACCOUNTS_PER_REQUEST = 1000
@@ -715,6 +716,22 @@ export function registerRoutes(server: FastifyInstance<Server, IncomingMessage, 
       subscribers: config.subscribers,
     }
     reply.send({ config: distributorConfig })
+  })
+
+  server.get('/metrics', (_request, reply) => {
+    if (config.VERBOSE) {
+      Logger.mainLogger.debug('Metrics requested')
+    }
+    try {
+      const metrics = getDataLogReaderMetrics()
+      if (config.VERBOSE) {
+        Logger.mainLogger.debug('Metrics: ', metrics)
+      }
+      reply.send(metrics)
+    } catch (e) {
+      Logger.mainLogger.error('Error getting metrics', e)
+      reply.status(500).send({ error: 'Error getting metrics' })
+    }
   })
 }
 
