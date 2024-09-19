@@ -93,7 +93,14 @@ export default class RMQModeHeathCheck {
 
   private async getQueues(exchange: string): Promise<string[]> {
     const queues = []
-    const url = `http://${process.env.RMQ_HOST}:15672/api/exchanges/%2F/${exchange}/bindings/source`
+
+    const protocol = process.env.RMQ_PROTOCOL === 'amqps' ? 'https' : 'http'
+    let host = `${process.env.RMQ_HOST}`
+    if (protocol === 'http') {
+      host += ':15672'
+    }
+
+    const url = `${protocol}://${host}/api/exchanges/%2F/${exchange}/bindings/source`
     try {
       const response = await axios.get(url, {
         auth: {
@@ -118,7 +125,13 @@ export default class RMQModeHeathCheck {
 
   private async getQueueMetrics(queue: string): Promise<RMQMetric> {
     try {
-      const url = `http://${process.env.RMQ_HOST}:15672/api/queues/%2F/${queue}`
+      const protocol = process.env.RMQ_PROTOCOL === 'amqps' ? 'https' : 'http'
+      let host = `${process.env.RMQ_HOST}`
+      if (protocol === 'http') {
+        host += ':15672'
+      }
+
+      const url = `${protocol}://${host}/api/queues/%2F/${queue}`
       const response = await axios.get<RMQMetric>(url, {
         auth: {
           username: process.env.RMQ_USER,
