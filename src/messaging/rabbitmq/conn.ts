@@ -11,7 +11,7 @@ export default class RMQConnection {
 
   public async getConnection(): Promise<Connection> {
     this.conn = await amqp.connect({
-      protocol: 'amqp',
+      protocol: process.env.RMQ_PROTOCOL || 'amqp',
       hostname: process.env.RMQ_HOST,
       port: process.env.RMQ_PORT ? parseInt(process.env.RMQ_PORT) : 5672,
       username: process.env.RMQ_USER,
