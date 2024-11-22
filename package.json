@@ -43,7 +43,7 @@
     "@types/amqplib": "^0.10.5",
     "@types/axios": "^0.14.0",
     "@types/jest": "29.5.12",
-    "@types/node": "18.16.1",
+    "@types/node": "18.19.1",
     "@types/node-fetch": "^2.5.4",
     "@types/socket.io": "^2.1.11",
     "@types/socket.io-client": "^1.4.33",
