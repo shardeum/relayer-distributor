@@ -9,7 +9,6 @@
     "distributor-log.json"
   ],
   "scripts": {
-    "release": "np --no-cleanup --no-tests --no-yarn --branch dev-release",
     "test": "npm run prepare && jest",
     "check": "gts check",
     "clean": "npm-run-all clean:*",
@@ -24,7 +23,11 @@
     "rmq_mode_apis": "npm run prepare && node build/src/rmq_api_server.js",
     "lint": "eslint \"./src/**/*.ts\"",
     "format-check": "prettier --check \"./src/**/*.ts\"",
-    "format-fix": "prettier --write \"./src/**/*.ts\""
+    "format-fix": "prettier --write \"./src/**/*.ts\"",
+    "release:prerelease": "npm run prepare && npm version prerelease --preid=prerelease && git push --follow-tags && npm publish --tag prerelease",
+    "release:patch": "npm run prepare && npm version patch && git push --follow-tags && npm publish",
+    "release:minor": "npm run prepare && npm version minor && git push --follow-tags && npm publish",
+    "release:major": "npm run prepare && npm version major && git push --follow-tags && npm publish"
   },
   "repository": {
     "type": "git",
