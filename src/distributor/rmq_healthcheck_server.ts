@@ -5,7 +5,7 @@ import { Server, IncomingMessage, ServerResponse } from 'http'
 import fastifyCors from '@fastify/cors'
 import fastify, { FastifyInstance } from 'fastify'
 import fastifyRateLimit from '@fastify/rate-limit'
-import { Utils as StringUtils } from '@shardus/types'
+import { Utils as StringUtils } from '@shardeum-foundation/lib-types'
 import RMQModeHeathCheck from './rmq_healthcheck_service'
 
 export const initRMQModeHttpServer = async (rmqHealthCheck: RMQModeHeathCheck): Promise<void> => {

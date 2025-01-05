@@ -1,6 +1,6 @@
 import * as db from './sqlite3storage'
 import { cycleDatabase } from '.'
-import { P2P, StateManager } from '@shardus/types'
+import { P2P, StateManager } from '@shardeum-foundation/lib-types'
 import * as Logger from '../Logger'
 import { config } from '../Config'
 import { DeSerializeFromJsonString, SerializeToJsonString } from '../utils/serialization'

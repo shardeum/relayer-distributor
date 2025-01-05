@@ -3,7 +3,7 @@ import * as Crypto from '../utils/Crypto'
 import { join } from 'path'
 import { config, overrideDefaultConfig } from '../Config'
 import DataLogReader from '../log-reader'
-import { Utils as StringUtils } from '@shardus/types'
+import { Utils as StringUtils } from '@shardeum-foundation/lib-types'
 import { incrementCycleCount, incrementOriginalTxCount, incrementReceiptCount } from '../metrics'
 
 const FILE = join(process.cwd(), 'distributor-config.json')

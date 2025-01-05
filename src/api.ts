@@ -1,4 +1,4 @@
-import { Signature } from '@shardus/crypto-utils'
+import { Signature } from '@shardeum-foundation/lib-crypto-utils'
 import { FastifyInstance, FastifyRequest } from 'fastify'
 import { Server, IncomingMessage, ServerResponse } from 'http'
 import { config } from './Config'
@@ -11,7 +11,7 @@ import * as TransactionDB from './dbstore/transactions'
 import * as ReceiptDB from './dbstore/receipts'
 import * as OriginalTxDB from './dbstore/originalTxsData'
 import { distributorSubscribers } from './distributor/utils'
-import { Utils as StringUtils } from '@shardus/types'
+import { Utils as StringUtils } from '@shardeum-foundation/lib-types'
 import { getDataLogReaderMetrics } from './metrics'
 
 const TXID_LENGTH = 64
