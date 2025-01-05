@@ -1,9 +1,9 @@
 // This script is used to test the WebSocket connection to a server.
 // It simulates a client sending signed data to the server and logs the server's responses.
 
-import * as crypto from '@shardus/crypto-utils'
+import * as crypto from '@shardeum-foundation/lib-crypto-utils'
 import * as WebSocket from 'ws'
-import { Utils as StringUtils } from '@shardus/types'
+import { Utils as StringUtils } from '@shardeum-foundation/lib-types'
 
 // Initialize the cryptographic utility library with a specific key.
 crypto.init('69fa4195670576c0160d660c3be36556ff8d504725be8a59b5a96509e0c994bc')

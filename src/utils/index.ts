@@ -3,7 +3,7 @@ import { readFileSync } from 'fs'
 import { config } from '../Config'
 import * as crypto from './Crypto'
 import * as Logger from '../Logger'
-import { Utils as StringUtils } from '@shardus/types'
+import { Utils as StringUtils } from '@shardeum-foundation/lib-types'
 
 export interface DistributorInfo {
   ip: string

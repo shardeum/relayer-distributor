@@ -10,7 +10,7 @@ import type { Worker } from 'node:cluster'
 import { handleSocketRequest, registerParentProcessListener, registerDataReaderListeners } from './child'
 import Fastify, { FastifyInstance } from 'fastify'
 import fastifyRateLimit from '@fastify/rate-limit'
-import { Utils as StringUtils } from '@shardus/types'
+import { Utils as StringUtils } from '@shardeum-foundation/lib-types'
 import { registerRoutes, validateRequestData } from '../api'
 import { healthCheckRouter } from '../routes/healthCheck'
 

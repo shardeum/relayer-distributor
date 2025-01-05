@@ -1,6 +1,6 @@
-import * as crypto from '@shardus/crypto-utils'
+import * as crypto from '@shardeum-foundation/lib-crypto-utils'
 import fetch from 'node-fetch'
-import { Utils as StringUtils } from '@shardus/types'
+import { Utils as StringUtils } from '@shardeum-foundation/lib-types'
 
 //run by entering command "ts-node api-tester.ts" in terminal
 

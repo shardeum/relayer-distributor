@@ -3,7 +3,7 @@ import { readFileSync } from 'fs'
 import * as Logger from './Logger'
 import * as merge from 'deepmerge'
 import * as minimist from 'minimist'
-import { Utils as StringUtils } from '@shardus/types'
+import { Utils as StringUtils } from '@shardeum-foundation/lib-types'
 
 export enum distributorMode {
   WS = 'WS',

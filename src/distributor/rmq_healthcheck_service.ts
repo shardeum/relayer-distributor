@@ -1,4 +1,4 @@
-import { CycleRecord } from '@shardus/types/build/src/p2p/CycleCreatorTypes'
+import { CycleRecord } from '@shardeum-foundation/lib-types/build/src/p2p/CycleCreatorTypes'
 import { distributorMode } from '../Config'
 import { CheckpointDao } from '../dbstore/checkpoints'
 import { queryLatestCycleRecords } from '../dbstore/cycles'
